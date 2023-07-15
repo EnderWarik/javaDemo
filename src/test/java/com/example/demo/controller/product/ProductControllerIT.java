@@ -4,6 +4,7 @@ import com.example.demo.controller.category.dto.CategoryDto;
 import com.example.demo.controller.product.dto.CreateProductDto;
 import com.example.demo.controller.product.dto.ProductDto;
 import com.example.demo.controller.product.dto.SearchProductDto;
+import com.example.demo.controller.product.dto.UpdateProductDto;
 import com.example.demo.model.CustomUser;
 import com.example.demo.model.Role;
 import com.example.demo.security.JwtService;
@@ -137,9 +138,42 @@ class ProductControllerIT {
     }
 
     @Test
-    @DataSet()
-    @ExpectedDataSet()
+    @DataSet(cleanBefore = true, cleanAfter = true, value = "datasets/api/product/update.json")
+    @ExpectedDataSet(value = "datasets/api/product/update__expected.json")
     void update() {
+        UUID id = UUID.fromString("7886493b-5a22-466d-a05a-7c74799603da");
+        UpdateProductDto dto = UpdateProductDto.builder()
+                .title("Клубника2")
+                .price(55L)
+                .categoryId(UUID.fromString("8886493b-5a22-466d-a05a-7c74799603da"))
+                .build();
+
+        ProductDto responseBody = webTestClient.post()
+                                                .uri(uriBuilder -> uriBuilder.path("/product/update/"+id.toString())
+                                                        .build())
+                                                .header("Authorization", "Bearer token")
+                                                .bodyValue(dto)
+                                                .exchange()
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBody(ProductDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
+        // Assert
+        ProductDto expectedBody = ProductDto.builder()
+                .id(id)
+                .title("Клубника2")
+                .price(55L)
+                .category(CategoryDto.builder()
+                        .id(UUID.fromString("8886493b-5a22-466d-a05a-7c74799603da"))
+                        .title("Фрукты")
+                        .build())
+                .build();
+
+        Assertions.assertThat(responseBody)
+                .usingRecursiveComparison()
+                .withStrictTypeChecking()
+                .isEqualTo(expectedBody);
     }
 
     @Test
