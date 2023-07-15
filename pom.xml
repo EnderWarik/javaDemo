@@ -142,9 +142,7 @@
                         <configuration>
                             <outputDirectory>target/generated-sources/annotations</outputDirectory>
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
-                            <options>
-                                <querydsl.packageSuffix>.model</querydsl.packageSuffix>
-                            </options>
+
                         </configuration>
                     </execution>
                 </executions>
